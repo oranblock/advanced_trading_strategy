@@ -178,7 +178,12 @@ Co-Authored-By: Claude <noreply@anthropic.com>"
 
 # Set up GitHub as remote
 echo "Setting up GitHub remote..."
-git remote add origin "https://github.com/$GITHUB_USERNAME/$REPO_NAME.git"
+if git remote | grep -q "origin"; then
+    echo "Remote 'origin' already exists. Updating URL..."
+    git remote set-url origin "https://github.com/$GITHUB_USERNAME/$REPO_NAME.git"
+else
+    git remote add origin "https://github.com/$GITHUB_USERNAME/$REPO_NAME.git"
+fi
 
 # Push to GitHub with instructions
 echo "Ready to push to GitHub"
