@@ -1,0 +1,44 @@
+DOWN_PROB_THRESHOLD: 0.85
+LOOK_FORWARD_CANDLES: 24
+MULTIPLIER: 1
+NEWS_AFFECTED_CURRENCIES:
+- USD
+- EUR
+NEWS_WINDOW_AFTER_MIN: 30
+NEWS_WINDOW_BEFORE_MIN: 30
+N_SPLITS_CV: 5
+PROFIT_TAKE_ATR: 2.5
+START_DATE: '2021-01-01'
+STOP_LOSS_ATR: 1.5
+SWING_POINT_ORDER: 10
+TICKER: C:EURUSD
+TIMEFRAME: hour
+UP_PROB_THRESHOLD: 0.85
+XGB_PARAMS:
+  alpha: 0.00019840517943508243
+  booster: gbtree
+  colsample_bytree: 0.9338766053096792
+  eta: 0.021958567151236525
+  eval_metric: logloss
+  gamma: 2.7453993032043625e-06
+  grow_policy: lossguide
+  lambda: 2.9356380909005304e-07
+  max_depth: 6
+  min_child_weight: 10
+  n_estimators: 252
+  objective: binary:logistic
+  subsample: 0.9253513647285841
+XGB_PARAMS_DOWN:
+  alpha: 0.2919022269103127
+  booster: gbtree
+  colsample_bytree: 0.8771031075694039
+  eta: 0.04529902238302772
+  eval_metric: logloss
+  gamma: 0.0009062997479241217
+  grow_policy: depthwise
+  lambda: 4.7263546788993326e-07
+  max_depth: 5
+  min_child_weight: 9
+  n_estimators: 334
+  objective: binary:logistic
+  subsample: 0.98394478746366

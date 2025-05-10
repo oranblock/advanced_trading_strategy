@@ -1,0 +1,8 @@
+pandas
+numpy
+talib-binary # Use talib-binary for easier install, or ensure TA-Lib C library is installed for 'TA-Lib'
+scikit-learn
+xgboost
+polygon-api-client
+scipy # For argrelextrema
+# Add forexnewsapi or other news API client if you use one

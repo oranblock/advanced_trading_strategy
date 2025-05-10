@@ -1,0 +1,71 @@
+# Logs and results
+tuning_logs/
+validation_results/
+*.log
+
+# IMPORTANT: API keys and sensitive data
+config/secrets.yaml
+**/keys.py
+**/secrets.py
+**/*api_key*
+**/*secret*
+**/*token*
+**/*.pem
+**/*.key
+**/credentials*
+.env.local
+.env.*.local
+
+# Data
+data/credentials/
+data/raw/
+data/*.csv
+data/*.pickle
+data/*.json
+
+# Python
+__pycache__/
+*.py[cod]
+*.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Environment
+.env
+.venv
+venv/
+ENV/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS specific
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+.env
