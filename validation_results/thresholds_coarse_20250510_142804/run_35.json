@@ -1,0 +1,53 @@
+{
+    "config": {
+        "UP_PROB_THRESHOLD": 0.7,
+        "DOWN_PROB_THRESHOLD": 0.8
+    },
+    "avg_metrics": {
+        "long_win_rate": 0.2581967213114754,
+        "short_win_rate": 0.7474326059050065,
+        "long_trades": 63.5,
+        "short_trades": 39.5,
+        "total_trades": 103.0,
+        "profit_factor": 2.0606060606060606,
+        "long_wins": 31.5,
+        "long_losses": 30.5,
+        "short_wins": 29.5,
+        "short_losses": 8.0,
+        "total_wins": 61.0,
+        "total_losses": 38.5,
+        "neutral_count": 7231.0
+    },
+    "fold_metrics": [
+        {
+            "long_win_rate": 0.5163934426229508,
+            "short_win_rate": 0.7631578947368421,
+            "long_trades": 122,
+            "short_trades": 38,
+            "total_trades": 160,
+            "profit_factor": 1.393939393939394,
+            "long_wins": 63,
+            "long_losses": 58,
+            "short_wins": 29,
+            "short_losses": 8,
+            "total_wins": 92,
+            "total_losses": 66,
+            "neutral_count": 7174
+        },
+        {
+            "long_win_rate": 0.0,
+            "short_win_rate": 0.7317073170731707,
+            "long_trades": 5,
+            "short_trades": 41,
+            "total_trades": 46,
+            "profit_factor": 2.727272727272727,
+            "long_wins": 0,
+            "long_losses": 3,
+            "short_wins": 30,
+            "short_losses": 8,
+            "total_wins": 30,
+            "total_losses": 11,
+            "neutral_count": 7288
+        }
+    ]
+}

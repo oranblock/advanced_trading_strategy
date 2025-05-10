@@ -1,0 +1,68 @@
+{
+    "config": {
+        "UP_PROB_THRESHOLD": 0.76,
+        "DOWN_PROB_THRESHOLD": 0.77
+    },
+    "avg_metrics": {
+        "long_win_rate": 0.45767062344957665,
+        "short_win_rate": 0.6308323045654016,
+        "long_trades": 281.0,
+        "short_trades": 1565.0,
+        "total_trades": 1846.0,
+        "profit_factor": 1.9928273153176874,
+        "long_wins": 110.66666666666667,
+        "long_losses": 145.66666666666666,
+        "short_wins": 983.6666666666666,
+        "short_losses": 423.3333333333333,
+        "total_wins": 1094.3333333333333,
+        "total_losses": 569.0,
+        "neutral_count": 3655.0
+    },
+    "fold_metrics": [
+        {
+            "long_win_rate": 0.6,
+            "short_win_rate": 0.6591606960081884,
+            "long_trades": 30,
+            "short_trades": 1954,
+            "total_trades": 1984,
+            "profit_factor": 2.7494736842105265,
+            "long_wins": 18,
+            "long_losses": 10,
+            "short_wins": 1288,
+            "short_losses": 465,
+            "total_wins": 1306,
+            "total_losses": 475,
+            "neutral_count": 3517
+        },
+        {
+            "long_win_rate": 0.38873239436619716,
+            "short_win_rate": 0.5808109651627641,
+            "long_trades": 355,
+            "short_trades": 1751,
+            "total_trades": 2106,
+            "profit_factor": 1.565040650406504,
+            "long_wins": 138,
+            "long_losses": 195,
+            "short_wins": 1017,
+            "short_losses": 543,
+            "total_wins": 1155,
+            "total_losses": 738,
+            "neutral_count": 3395
+        },
+        {
+            "long_win_rate": 0.38427947598253276,
+            "short_win_rate": 0.6525252525252525,
+            "long_trades": 458,
+            "short_trades": 990,
+            "total_trades": 1448,
+            "profit_factor": 1.6639676113360324,
+            "long_wins": 176,
+            "long_losses": 232,
+            "short_wins": 646,
+            "short_losses": 262,
+            "total_wins": 822,
+            "total_losses": 494,
+            "neutral_count": 4053
+        }
+    ]
+}

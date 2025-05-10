@@ -1,0 +1,68 @@
+{
+    "config": {
+        "UP_PROB_THRESHOLD": 0.85,
+        "DOWN_PROB_THRESHOLD": 0.75
+    },
+    "avg_metrics": {
+        "long_win_rate": 0.6666666666666666,
+        "short_win_rate": 0.6500570913104232,
+        "long_trades": 1.0,
+        "short_trades": 284.0,
+        "total_trades": 285.0,
+        "profit_factor": 1.5533333333333335,
+        "long_wins": 1.0,
+        "long_losses": 0.0,
+        "short_wins": 169.0,
+        "short_losses": 73.33333333333333,
+        "total_wins": 170.0,
+        "total_losses": 73.33333333333333,
+        "neutral_count": 5216.0
+    },
+    "fold_metrics": [
+        {
+            "long_win_rate": 0,
+            "short_win_rate": 0.6519916142557652,
+            "long_trades": 0,
+            "short_trades": 477,
+            "total_trades": 477,
+            "profit_factor": 3.11,
+            "long_wins": 0,
+            "long_losses": 0,
+            "short_wins": 311,
+            "short_losses": 100,
+            "total_wins": 311,
+            "total_losses": 100,
+            "neutral_count": 5024
+        },
+        {
+            "long_win_rate": 1.0,
+            "short_win_rate": 0.5124653739612188,
+            "long_trades": 1,
+            "short_trades": 361,
+            "total_trades": 362,
+            "profit_factor": 1.55,
+            "long_wins": 1,
+            "long_losses": 0,
+            "short_wins": 185,
+            "short_losses": 120,
+            "total_wins": 186,
+            "total_losses": 120,
+            "neutral_count": 5139
+        },
+        {
+            "long_win_rate": 1.0,
+            "short_win_rate": 0.7857142857142857,
+            "long_trades": 2,
+            "short_trades": 14,
+            "total_trades": 16,
+            "profit_factor": 0,
+            "long_wins": 2,
+            "long_losses": 0,
+            "short_wins": 11,
+            "short_losses": 0,
+            "total_wins": 13,
+            "total_losses": 0,
+            "neutral_count": 5485
+        }
+    ]
+}

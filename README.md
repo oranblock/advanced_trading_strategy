@@ -21,28 +21,35 @@ This project implements a comprehensive trading strategy pipeline that:
 5. Trains XGBoost models to predict market direction
 6. Optimizes strategy with an advanced hyperparameter tuning framework
 7. Generates trading signals using a dual-model approach
+8. Validates robustness with extended walk-forward analysis across decades of data
 
 ## Project Structure
 
 ```
 advanced_trading_strategy/
-├── config/                # Configuration files
-│   └── settings.yaml     # Strategy parameters
-├── data/                  # Data storage (market data, etc.)
-├── logs/                  # Log files
-├── notebooks/             # Jupyter notebooks for analysis
-├── src/                   # Source code
-│   ├── config_loader.py  # Configuration loading utilities
-│   ├── data_handler.py   # Data fetching and processing
-│   ├── feature_generator.py # Feature engineering
+├── config/                     # Configuration files
+│   ├── settings.yaml          # Strategy parameters
+│   └── liquidity_settings.yaml # Liquidity strategy parameters
+├── data/                       # Data storage (market data, etc.)
+├── logs/                       # Log files
+├── notebooks/                  # Jupyter notebooks for analysis
+├── src/                        # Source code
+│   ├── config_loader.py       # Configuration loading utilities
+│   ├── data_handler.py        # Data fetching and processing
+│   ├── feature_generator.py   # Feature engineering
 │   ├── hyperparameter_tuning.py # Hyperparameter optimization
-│   ├── main_strategy.py  # Main strategy implementation
-│   ├── model_trainer.py  # Model training utilities
-│   ├── threshold_tuner.py # Specialized probability threshold tuning
-│   ├── utils.py          # Utility functions
+│   ├── liquidity_strategy.py  # Specialized liquidity trading strategy
+│   ├── main_strategy.py       # Main strategy implementation
+│   ├── model_trainer.py       # Model training utilities
+│   ├── threshold_tuner.py     # Specialized probability threshold tuning
+│   ├── utils.py               # Utility functions
 │   └── validation_framework.py # Cross-validation framework
-├── tune_strategy.py       # Command-line tool for optimization
-└── requirements.txt       # Python dependencies
+├── liquidity_strategy_standalone.py # Standalone liquidity strategy implementation
+├── liquidity_strategy_production.py # Production-ready strategy for real trading
+├── extended_walkforward_analysis.py # Extended walkforward analysis for robustness testing
+├── run_extended_walkforward.sh      # Script to run walkforward analysis across timeframes
+├── tune_strategy.py                 # Command-line tool for optimization
+└── requirements.txt                 # Python dependencies
 ```
 
 ## Getting Started
@@ -85,6 +92,11 @@ Edit `config/settings.yaml` to configure your strategy parameters:
 Run the main strategy:
 ```bash
 python -m src.main_strategy
+```
+
+Or use the production-ready liquidity strategy:
+```bash
+python liquidity_strategy_production.py --mode all --ticker EURUSD --timeframe hour --plot-results
 ```
 
 ## Strategy Optimization
@@ -145,6 +157,68 @@ Run all tuning processes:
 
 ```bash
 python tune_strategy.py --tune-all
+```
+
+## Extended Walk-Forward Analysis
+
+A key component of our framework is extended walk-forward analysis that validates strategy robustness across multiple decades and market regimes.
+
+### Running Walk-Forward Analysis
+
+Run the extended walk-forward analysis across multiple timeframes:
+
+```bash
+# Run the extended walk-forward analysis script
+./run_extended_walkforward.sh
+```
+
+This script will:
+1. Run walk-forward analysis on hourly data (10 years)
+2. Run walk-forward analysis on daily data (30 years)
+3. Run walk-forward analysis on weekly data (50 years)
+4. Generate a comprehensive combined report
+
+### Analysis Parameters
+
+The extended walk-forward analysis examines:
+- **Multiple Timeframes**: From hourly to weekly data
+- **Extended History**: 10-50 years of market data
+- **Multiple Market Regimes**: Bull markets, bear markets, sideways markets
+- **Different Economic Cycles**: Inflation, deflation, recession, expansion
+- **Structural Market Changes**: Changes in market microstructure over decades
+
+### Results Visualization
+
+The analysis generates multiple visualizations:
+- **Performance by Window**: Profit factor, win rate, and total return across all windows
+- **Performance Over Time**: How metrics evolve across different market regimes
+- **Performance Relationships**: How different metrics correlate with each other
+- **Performance Distributions**: Statistical distributions of key metrics
+
+### Comprehensive Report
+
+The final report includes:
+- **Strategy Robustness Rating**: Overall assessment of strategy strength
+- **Market Regime Analysis**: Performance across different market conditions
+- **Consistent Profitability**: Percentage of windows with positive performance
+- **Parameter Stability**: Assessment of parameter effectiveness over time
+- **Recommendations**: Actionable insights for strategy deployment
+
+## Production Strategy
+
+The `liquidity_strategy_production.py` script provides a production-ready implementation with:
+
+- **Multiple Operation Modes**: Backtest, train, analyze, or all-in-one
+- **Command-line Interface**: Easy configuration of all parameters
+- **Extended Data Support**: Handles large historical datasets (10-50 years)
+- **Walk-Forward Analysis**: Tests strategy consistency across market regimes
+- **Advanced Visualization**: Comprehensive performance visualizations
+- **Thorough Reporting**: Detailed performance metrics and statistics
+
+Example usage:
+```bash
+# Run complete analysis on EURUSD hourly data
+python liquidity_strategy_production.py --mode all --ticker EURUSD --timeframe hour --start-date 2015-01-01 --windows 5 --plot-results
 ```
 
 ## Validation Framework

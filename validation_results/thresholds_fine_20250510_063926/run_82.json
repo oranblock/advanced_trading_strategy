@@ -1,0 +1,68 @@
+{
+    "config": {
+        "UP_PROB_THRESHOLD": 0.82,
+        "DOWN_PROB_THRESHOLD": 0.79
+    },
+    "avg_metrics": {
+        "long_win_rate": 0.3333333333333333,
+        "short_win_rate": 0.6407929055816379,
+        "long_trades": 7.333333333333333,
+        "short_trades": 763.3333333333334,
+        "total_trades": 770.6666666666666,
+        "profit_factor": 2.776250464989842,
+        "long_wins": 3.6666666666666665,
+        "long_losses": 3.0,
+        "short_wins": 474.0,
+        "short_losses": 205.0,
+        "total_wins": 477.6666666666667,
+        "total_losses": 208.0,
+        "neutral_count": 4730.333333333333
+    },
+    "fold_metrics": [
+        {
+            "long_win_rate": 0,
+            "short_win_rate": 0.6658130601792573,
+            "long_trades": 0,
+            "short_trades": 1562,
+            "total_trades": 1562,
+            "profit_factor": 2.9461756373937678,
+            "long_wins": 0,
+            "long_losses": 0,
+            "short_wins": 1040,
+            "short_losses": 353,
+            "total_wins": 1040,
+            "total_losses": 353,
+            "neutral_count": 3939
+        },
+        {
+            "long_win_rate": 0.5,
+            "short_win_rate": 0.5137085137085137,
+            "long_trades": 18,
+            "short_trades": 693,
+            "total_trades": 711,
+            "profit_factor": 1.3825757575757576,
+            "long_wins": 9,
+            "long_losses": 8,
+            "short_wins": 356,
+            "short_losses": 256,
+            "total_wins": 365,
+            "total_losses": 264,
+            "neutral_count": 4790
+        },
+        {
+            "long_win_rate": 0.5,
+            "short_win_rate": 0.7428571428571429,
+            "long_trades": 4,
+            "short_trades": 35,
+            "total_trades": 39,
+            "profit_factor": 4.0,
+            "long_wins": 2,
+            "long_losses": 1,
+            "short_wins": 26,
+            "short_losses": 6,
+            "total_wins": 28,
+            "total_losses": 7,
+            "neutral_count": 5462
+        }
+    ]
+}

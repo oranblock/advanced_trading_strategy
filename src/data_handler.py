@@ -2,7 +2,7 @@ import pandas as pd
 from polygon import RESTClient
 from datetime import datetime
 
-def fetch_polygon_data("REMOVED_FOR_SECURITY"):
+def fetch_polygon_data(api_key, ticker="C:EURUSD", timespan="hour", multiplier=1, start_date_str="2020-01-01", end_date_str="2023-12-31"):
     """Fetches historical forex data from Polygon.io."""
     if not api_key:
         raise ValueError("Polygon API key is required.")
@@ -79,7 +79,7 @@ if __name__ == '__main__':
         print("POLYGON_API_KEY_TEST not set. Skipping Polygon fetch test.")
     else:
         print(f"Testing Polygon data fetch with key: ...{api_key[-4:]}")
-        df_test = fetch_polygon_data("REMOVED_FOR_SECURITY")
+        df_test = fetch_polygon_data(api_key, ticker="C:EURUSD", timespan="day", start_date_str="2023-01-01", end_date_str="2023-01-10")
         if not df_test.empty:
             print("Polygon data fetched successfully:")
             print(df_test.head())

@@ -1,0 +1,43 @@
+
+        <html>
+        <head>
+            <title>Feature Experiment Results</title>
+            <style>
+                body { font-family: Arial, sans-serif; margin: 20px; }
+                h1, h2 { color: #333; }
+                table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+                th, td { border: 1px solid #ddd; padding: 8px; }
+                th { background-color: #f2f2f2; text-align: left; }
+                tr:nth-child(even) { background-color: #f9f9f9; }
+                img { max-width: 100%; height: auto; margin: 20px 0; }
+            </style>
+        </head>
+        <body>
+            <h1>Feature Experiment Results</h1>
+            
+            <h2>Experiment Comparison</h2>
+            <table>
+                <tr>
+                    <th>Experiment</th>
+                    <th>Feature Count</th>
+                    <th>Profit Factor</th>
+                    <th>Total Trades</th>
+                    <th>Long Win Rate</th>
+                    <th>Short Win Rate</th>
+                    <th>Total Wins</th>
+                    <th>Total Losses</th>
+                </tr>
+                <tr><td>baseline</td><td>30</td><td>0.75</td><td>38</td><td>0.71</td><td>0.32</td><td>15</td><td>20</td></tr><tr><td>session_features</td><td>54</td><td>21.43</td><td>498</td><td>0.85</td><td>0.92</td><td>450</td><td>21</td></tr><tr><td>external_liquidity</td><td>43</td><td>16.70</td><td>1228</td><td>0.86</td><td>0.93</td><td>1119</td><td>67</td></tr><tr><td>advanced_fvg</td><td>0</td><td>0.00</td><td>0</td><td>0.00</td><td>0.00</td><td>0</td><td>0</td></tr><tr><td>premium_discount</td><td>72</td><td>1.08</td><td>60</td><td>0.40</td><td>0.47</td><td>28</td><td>26</td></tr>
+            </table>
+            
+            <h2>Profit Factor Comparison</h2>
+            <img src="plots/profit_factor_comparison.png" alt="Profit Factor Comparison">
+            
+            <h2>Win Rate Comparison</h2>
+            <img src="plots/win_rate_comparison.png" alt="Win Rate Comparison">
+            
+            <h2>Feature Importance</h2>
+            <h3>baseline Model</h3><img src='plots/baseline_up_importance.png'><img src='plots/baseline_down_importance.png'><h3>session_features Model</h3><img src='plots/session_features_up_importance.png'><img src='plots/session_features_down_importance.png'><h3>external_liquidity Model</h3><img src='plots/external_liquidity_up_importance.png'><img src='plots/external_liquidity_down_importance.png'><h3>advanced_fvg Model</h3><img src='plots/advanced_fvg_up_importance.png'><img src='plots/advanced_fvg_down_importance.png'><h3>premium_discount Model</h3><img src='plots/premium_discount_up_importance.png'><img src='plots/premium_discount_down_importance.png'>
+        </body>
+        </html>
+        

@@ -1,0 +1,43 @@
+
+        <html>
+        <head>
+            <title>Feature Experiment Results</title>
+            <style>
+                body { font-family: Arial, sans-serif; margin: 20px; }
+                h1, h2 { color: #333; }
+                table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+                th, td { border: 1px solid #ddd; padding: 8px; }
+                th { background-color: #f2f2f2; text-align: left; }
+                tr:nth-child(even) { background-color: #f9f9f9; }
+                img { max-width: 100%; height: auto; margin: 20px 0; }
+            </style>
+        </head>
+        <body>
+            <h1>Feature Experiment Results</h1>
+            
+            <h2>Experiment Comparison</h2>
+            <table>
+                <tr>
+                    <th>Experiment</th>
+                    <th>Feature Count</th>
+                    <th>Profit Factor</th>
+                    <th>Total Trades</th>
+                    <th>Long Win Rate</th>
+                    <th>Short Win Rate</th>
+                    <th>Total Wins</th>
+                    <th>Total Losses</th>
+                </tr>
+                <tr><td>baseline</td><td>30</td><td>0.85</td><td>51</td><td>0.00</td><td>0.50</td><td>22</td><td>26</td></tr><tr><td>advanced</td><td>0</td><td>0.00</td><td>0</td><td>0.00</td><td>0.00</td><td>0</td><td>0</td></tr>
+            </table>
+            
+            <h2>Profit Factor Comparison</h2>
+            <img src="plots/profit_factor_comparison.png" alt="Profit Factor Comparison">
+            
+            <h2>Win Rate Comparison</h2>
+            <img src="plots/win_rate_comparison.png" alt="Win Rate Comparison">
+            
+            <h2>Feature Importance</h2>
+            <h3>baseline Model</h3><img src='plots/baseline_up_importance.png'><img src='plots/baseline_down_importance.png'><h3>advanced Model</h3><img src='plots/advanced_up_importance.png'><img src='plots/advanced_down_importance.png'>
+        </body>
+        </html>
+        

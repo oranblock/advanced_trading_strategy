@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liquidity Strategy Dashboard</title>
+    <meta http-equiv="refresh" content="60"> <!-- Auto-refresh every 60 seconds -->
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #343a40;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 5px 5px 0 0;
+            margin-bottom: 20px;
+        }
+        .stats-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .stat-box {
+            background-color: white;
+            border-radius: 5px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            flex: 1;
+            margin: 10px;
+            min-width: 200px;
+        }
+        .stat-title {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .positive {
+            color: #28a745;
+        }
+        .negative {
+            color: #dc3545;
+        }
+        .neutral {
+            color: #6c757d;
+        }
+        .chart-container {
+            background-color: white;
+            border-radius: 5px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .trades-container {
+            background-color: white;
+            border-radius: 5px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        .current-signal {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            margin-bottom: 20px;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .signal-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 0 10px;
+            min-width: 120px;
+        }
+        .long-signal {
+            background-color: rgba(40, 167, 69, 0.1);
+            border: 1px solid #28a745;
+        }
+        .short-signal {
+            background-color: rgba(220, 53, 69, 0.1);
+            border: 1px solid #dc3545;
+        }
+        .neutral-signal {
+            background-color: rgba(108, 117, 125, 0.1);
+            border: 1px solid #6c757d;
+        }
+        .signal-label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        .signal-value {
+            font-size: 22px;
+            font-weight: bold;
+        }
+        .open-position {
+            background-color: #17a2b8;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+            text-align: center;
+        }
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #6c757d;
+            font-size: 14px;
+        }
+        @media (max-width: 768px) {
+            .stats-container {
+                flex-direction: column;
+            }
+            .stat-box {
+                width: 100%;
+                margin: 5px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Liquidity Trading Strategy Dashboard</h1>
+            <p>EURUSD - Hourly Timeframe</p>
+            <p id="last-updated">Last Updated: <span id="update-time"></span></p>
+        </div>
+
+        <div class="current-signal">
+            <div class="signal-box long-signal">
+                <div class="signal-label">UP Probability</div>
+                <div class="signal-value" id="up-probability">0.00%</div>
+            </div>
+            <div class="signal-box neutral-signal">
+                <div class="signal-label">Current Signal</div>
+                <div class="signal-value" id="current-signal">NEUTRAL</div>
+            </div>
+            <div class="signal-box short-signal">
+                <div class="signal-label">DOWN Probability</div>
+                <div class="signal-value" id="down-probability">0.00%</div>
+            </div>
+        </div>
+
+        <div class="stats-container">
+            <div class="stat-box">
+                <div class="stat-title">Account Balance</div>
+                <div class="stat-value" id="account-balance">$10,000.00</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-title">Total Return</div>
+                <div class="stat-value" id="total-return">0.00%</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-title">Win Rate</div>
+                <div class="stat-value" id="win-rate">0.00%</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-title">Profit Factor</div>
+                <div class="stat-value" id="profit-factor">0.00</div>
+            </div>
+        </div>
+
+        <div class="stats-container">
+            <div class="stat-box">
+                <div class="stat-title">Total Trades</div>
+                <div class="stat-value" id="total-trades">0</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-title">Winning Trades</div>
+                <div class="stat-value positive" id="winning-trades">0</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-title">Losing Trades</div>
+                <div class="stat-value negative" id="losing-trades">0</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-title">Max Drawdown</div>
+                <div class="stat-value" id="max-drawdown">0.00%</div>
+            </div>
+        </div>
+
+        <div id="position-container"></div>
+
+        <div class="chart-container">
+            <h2>Equity Curve</h2>
+            <div id="equity-chart">
+                <img src="realtime_results/equity_curve.png" alt="Equity Curve" style="width: 100%; height: auto;" id="equity-image">
+            </div>
+        </div>
+
+        <div class="trades-container">
+            <h2>Recent Trades</h2>
+            <table id="trades-table">
+                <thead>
+                    <tr>
+                        <th>Time</th>
+                        <th>Action</th>
+                        <th>Direction</th>
+                        <th>Price</th>
+                        <th>Size</th>
+                        <th>P&L</th>
+                    </tr>
+                </thead>
+                <tbody id="trades-body">
+                    <!-- Trades will be populated here by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="trades-container">
+            <h2>Recent Signals</h2>
+            <table id="signals-table">
+                <thead>
+                    <tr>
+                        <th>Time</th>
+                        <th>Signal</th>
+                        <th>UP Probability</th>
+                        <th>DOWN Probability</th>
+                        <th>Price</th>
+                    </tr>
+                </thead>
+                <tbody id="signals-body">
+                    <!-- Signals will be populated here by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="footer">
+            <p>Liquidity Strategy Dashboard | Built with Claude Code | Refreshes every 60 seconds</p>
+        </div>
+    </div>
+
+    <script>
+        // Update the last updated time
+        function updateLastUpdated() {
+            const now = new Date();
+            document.getElementById('update-time').textContent = now.toLocaleString();
+        }
+
+        // Function to load the latest performance data
+        async function loadPerformanceData() {
+            try {
+                const response = await fetch('realtime_results/performance.json');
+                if (!response.ok) {
+                    console.error('Could not load performance data');
+                    return;
+                }
+                
+                const data = await response.json();
+                
+                // Update the dashboard stats
+                document.getElementById('account-balance').textContent = '$' + data.current_equity.toFixed(2);
+                
+                const totalReturn = (data.total_return * 100).toFixed(2);
+                const totalReturnElement = document.getElementById('total-return');
+                totalReturnElement.textContent = totalReturn + '%';
+                totalReturnElement.className = 'stat-value ' + (totalReturn >= 0 ? 'positive' : 'negative');
+                
+                document.getElementById('win-rate').textContent = (data.win_rate * 100).toFixed(2) + '%';
+                document.getElementById('profit-factor').textContent = data.profit_factor.toFixed(2);
+                document.getElementById('total-trades').textContent = data.total_trades;
+                document.getElementById('winning-trades').textContent = data.winning_trades;
+                document.getElementById('losing-trades').textContent = data.losing_trades;
+                document.getElementById('max-drawdown').textContent = (data.max_drawdown * 100).toFixed(2) + '%';
+                
+                // Show current position if there is one
+                const positionContainer = document.getElementById('position-container');
+                if (data.current_position !== "FLAT") {
+                    positionContainer.innerHTML = `
+                        <div class="open-position">
+                            <h3>Open Position: ${data.current_position}</h3>
+                            <p>Size: ${data.position_size} lots</p>
+                        </div>
+                    `;
+                } else {
+                    positionContainer.innerHTML = '';
+                }
+                
+                // Refresh the equity curve image (add timestamp to prevent caching)
+                document.getElementById('equity-image').src = 'realtime_results/equity_curve.png?' + new Date().getTime();
+                
+            } catch (error) {
+                console.error('Error loading performance data:', error);
+            }
+        }
+
+        // Function to load the latest signal
+        async function loadLatestSignal() {
+            try {
+                const today = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+                const response = await fetch(`realtime_logs/signals_${today}.jsonl`);
+                
+                if (!response.ok) {
+                    console.error('Could not load signals data');
+                    return;
+                }
+                
+                const text = await response.text();
+                const lines = text.trim().split('\n');
+                
+                if (lines.length === 0) {
+                    return;
+                }
+                
+                // Get the last signal
+                const lastSignal = JSON.parse(lines[lines.length - 1]);
+                
+                // Update the signal display
+                document.getElementById('up-probability').textContent = (lastSignal.up_probability * 100).toFixed(2) + '%';
+                document.getElementById('down-probability').textContent = (lastSignal.down_probability * 100).toFixed(2) + '%';
+                
+                const currentSignalElement = document.getElementById('current-signal');
+                currentSignalElement.textContent = lastSignal.signal;
+                
+                // Update signal box class based on signal
+                const signalBox = currentSignalElement.parentElement;
+                signalBox.className = 'signal-box';
+                if (lastSignal.signal === 'LONG') {
+                    signalBox.classList.add('long-signal');
+                } else if (lastSignal.signal === 'SHORT') {
+                    signalBox.classList.add('short-signal');
+                } else {
+                    signalBox.classList.add('neutral-signal');
+                }
+                
+                // Populate signals table
+                const signalsBody = document.getElementById('signals-body');
+                signalsBody.innerHTML = '';
+                
+                // Get the last 10 signals (or less if there are fewer)
+                const numSignals = Math.min(10, lines.length);
+                for (let i = lines.length - numSignals; i < lines.length; i++) {
+                    const signal = JSON.parse(lines[i]);
+                    const row = document.createElement('tr');
+                    
+                    row.innerHTML = `
+                        <td>${signal.timestamp}</td>
+                        <td>${signal.signal}</td>
+                        <td>${(signal.up_probability * 100).toFixed(2)}%</td>
+                        <td>${(signal.down_probability * 100).toFixed(2)}%</td>
+                        <td>${signal.close.toFixed(5)}</td>
+                    `;
+                    
+                    // Add class to row based on signal
+                    if (signal.signal === 'LONG') {
+                        row.className = 'positive';
+                    } else if (signal.signal === 'SHORT') {
+                        row.className = 'negative';
+                    }
+                    
+                    signalsBody.prepend(row);
+                }
+                
+            } catch (error) {
+                console.error('Error loading signal data:', error);
+            }
+        }
+
+        // Function to load trades
+        async function loadTrades() {
+            try {
+                const today = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+                const response = await fetch(`realtime_logs/trades_${today}.jsonl`);
+                
+                if (!response.ok) {
+                    console.error('Could not load trades data');
+                    return;
+                }
+                
+                const text = await response.text();
+                const lines = text.trim().split('\n');
+                
+                if (lines.length === 0) {
+                    return;
+                }
+                
+                // Populate trades table
+                const tradesBody = document.getElementById('trades-body');
+                tradesBody.innerHTML = '';
+                
+                // Get the last 10 trades (or less if there are fewer)
+                const numTrades = Math.min(10, lines.length);
+                for (let i = lines.length - numTrades; i < lines.length; i++) {
+                    if (lines[i].trim() === '') continue;
+                    
+                    const trade = JSON.parse(lines[i]);
+                    const row = document.createElement('tr');
+                    
+                    let pnlDisplay = '';
+                    if (trade.pnl !== null) {
+                        pnlDisplay = trade.pnl >= 0 ? 
+                            `<span class="positive">+$${trade.pnl.toFixed(2)}</span>` : 
+                            `<span class="negative">-$${Math.abs(trade.pnl).toFixed(2)}</span>`;
+                    } else {
+                        pnlDisplay = '-';
+                    }
+                    
+                    row.innerHTML = `
+                        <td>${trade.timestamp}</td>
+                        <td>${trade.action}</td>
+                        <td>${trade.direction}</td>
+                        <td>${trade.price.toFixed(5)}</td>
+                        <td>${trade.size.toFixed(2)}</td>
+                        <td>${pnlDisplay}</td>
+                    `;
+                    
+                    tradesBody.prepend(row);
+                }
+                
+            } catch (error) {
+                console.error('Error loading trades data:', error);
+            }
+        }
+
+        // Update everything when the page loads
+        window.onload = function() {
+            updateLastUpdated();
+            loadPerformanceData();
+            loadLatestSignal();
+            loadTrades();
+            
+            // Refresh data every 60 seconds
+            setInterval(() => {
+                updateLastUpdated();
+                loadPerformanceData();
+                loadLatestSignal();
+                loadTrades();
+            }, 60000);
+        };
+    </script>
+</body>
+</html>

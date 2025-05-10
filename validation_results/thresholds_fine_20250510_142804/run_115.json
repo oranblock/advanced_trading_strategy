@@ -1,0 +1,68 @@
+{
+    "config": {
+        "UP_PROB_THRESHOLD": 0.85,
+        "DOWN_PROB_THRESHOLD": 0.74
+    },
+    "avg_metrics": {
+        "long_win_rate": 0.6666666666666666,
+        "short_win_rate": 0.632674920910215,
+        "long_trades": 1.0,
+        "short_trades": 314.6666666666667,
+        "total_trades": 315.6666666666667,
+        "profit_factor": 1.481505376344086,
+        "long_wins": 1.0,
+        "long_losses": 0.0,
+        "short_wins": 188.0,
+        "short_losses": 83.0,
+        "total_wins": 189.0,
+        "total_losses": 83.0,
+        "neutral_count": 5185.333333333333
+    },
+    "fold_metrics": [
+        {
+            "long_win_rate": 0,
+            "short_win_rate": 0.6486486486486487,
+            "long_trades": 0,
+            "short_trades": 555,
+            "total_trades": 555,
+            "profit_factor": 2.88,
+            "long_wins": 0,
+            "long_losses": 0,
+            "short_wins": 360,
+            "short_losses": 125,
+            "total_wins": 360,
+            "total_losses": 125,
+            "neutral_count": 4946
+        },
+        {
+            "long_win_rate": 1.0,
+            "short_win_rate": 0.516042780748663,
+            "long_trades": 1,
+            "short_trades": 374,
+            "total_trades": 375,
+            "profit_factor": 1.564516129032258,
+            "long_wins": 1,
+            "long_losses": 0,
+            "short_wins": 193,
+            "short_losses": 124,
+            "total_wins": 194,
+            "total_losses": 124,
+            "neutral_count": 5126
+        },
+        {
+            "long_win_rate": 1.0,
+            "short_win_rate": 0.7333333333333333,
+            "long_trades": 2,
+            "short_trades": 15,
+            "total_trades": 17,
+            "profit_factor": 0,
+            "long_wins": 2,
+            "long_losses": 0,
+            "short_wins": 11,
+            "short_losses": 0,
+            "total_wins": 13,
+            "total_losses": 0,
+            "neutral_count": 5484
+        }
+    ]
+}

@@ -1,0 +1,23 @@
+{
+    "long_win_rate": 0.0,
+    "short_win_rate": 0.4166666666666667,
+    "long_trades": 0,
+    "short_trades": 12,
+    "total_trades": 12,
+    "profit_factor": 1.0,
+    "long_wins": 0,
+    "long_losses": 0,
+    "short_wins": 5,
+    "short_losses": 5,
+    "total_wins": 5,
+    "total_losses": 5,
+    "neutral_count": 5488,
+    "up_accuracy": 0.6894545454545454,
+    "up_precision": 0.0,
+    "up_recall": 0.0,
+    "up_f1": 0.0,
+    "down_accuracy": 0.4207272727272727,
+    "down_precision": 0.5614035087719298,
+    "down_recall": 0.010021922956467273,
+    "down_f1": 0.019692307692307693
+}

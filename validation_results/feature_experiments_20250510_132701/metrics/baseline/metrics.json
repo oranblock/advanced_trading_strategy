@@ -1,0 +1,33 @@
+{
+    "validation": {
+        "long_win_rate": 0.0,
+        "short_win_rate": 0.6666666666666666,
+        "long_trades": 0,
+        "short_trades": 9,
+        "total_trades": 9,
+        "profit_factor": 2.0,
+        "long_wins": 0,
+        "long_losses": 0,
+        "short_wins": 6,
+        "short_losses": 3,
+        "total_wins": 6,
+        "total_losses": 3,
+        "neutral_count": 4116
+    },
+    "test": {
+        "long_win_rate": 0.7142857142857143,
+        "short_win_rate": 0.3225806451612903,
+        "long_trades": 7,
+        "short_trades": 31,
+        "total_trades": 38,
+        "profit_factor": 0.75,
+        "long_wins": 5,
+        "long_losses": 1,
+        "short_wins": 10,
+        "short_losses": 19,
+        "total_wins": 15,
+        "total_losses": 20,
+        "neutral_count": 4089
+    },
+    "feature_count": 30
+}

@@ -1,0 +1,15 @@
+{
+    "objective": "binary:logistic",
+    "eval_metric": "logloss",
+    "booster": "gbtree",
+    "lambda": 0.03556417180013618,
+    "alpha": 5.334144614089902e-07,
+    "max_depth": 6,
+    "eta": 0.2924513449190531,
+    "gamma": 0.001411769344999781,
+    "subsample": 0.9881809288460872,
+    "colsample_bytree": 0.5960367955611403,
+    "min_child_weight": 8,
+    "grow_policy": "lossguide",
+    "n_estimators": 395
+}
