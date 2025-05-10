@@ -151,20 +151,32 @@ if command -v gh &> /dev/null; then
     echo "Creating GitHub repository using GitHub CLI..."
     gh repo create "$REPO_NAME" --description "$REPO_DESCRIPTION" --"$REPO_VISIBILITY" --source=. --remote=origin --push
 else
-    # Alternative method using the GitHub API
-    echo "GitHub CLI not found. Creating repository using the GitHub API..."
-    
-    # Create new repository on GitHub
-    echo "Creating new repository on GitHub: $REPO_NAME"
-    curl -s -H "Authorization: token $GITHUB_TOKEN" https://api.github.com/user/repos -d "{\"name\":\"$REPO_NAME\",\"description\":\"$REPO_DESCRIPTION\",\"private\":$([ "$REPO_VISIBILITY" = "private" ] && echo "true" || echo "false")}" > /dev/null
+    # Manual setup instructions
+    echo "GitHub CLI not found. Please set up repository manually:"
+    echo "1. Create a new repository on GitHub: https://github.com/new"
+    echo "   - Name: $REPO_NAME"
+    echo "   - Description: $REPO_DESCRIPTION"
+    echo "   - Visibility: $REPO_VISIBILITY"
+    echo "   - Do NOT initialize with README, .gitignore, or license files"
+    echo ""
+    echo "2. After creating the repository, run these commands:"
+    echo "   git remote add origin git@github.com:YOUR_USERNAME/$REPO_NAME.git"
+    echo "   git push -u origin master"
+    echo ""
 
-    # Set up the remote
-    echo "Setting up Git remote..."
-    git remote add origin git@github.com:$(git config user.name)/$REPO_NAME.git
+    # Prompt user for GitHub username
+    read -p "Enter your GitHub username to set up remote now: " GITHUB_USERNAME
 
-    # Push to GitHub
-    echo "Pushing code to GitHub..."
-    git push -u origin master || git push -u origin main
+    if [ -n "$GITHUB_USERNAME" ]; then
+        # Set up the remote
+        echo "Setting up Git remote..."
+        git remote add origin git@github.com:$GITHUB_USERNAME/$REPO_NAME.git
+
+        echo "Remote set up successfully. To push your code, run:"
+        echo "git push -u origin master"
+    else
+        echo "No username provided. You'll need to set up the remote manually later."
+    fi
 fi
 
 echo "Repository setup complete! Your code is now on GitHub."

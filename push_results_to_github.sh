@@ -40,6 +40,17 @@ if [ ! -d .git ]; then
     exit 1
 fi
 
+# Ensure we're using SSH for the remote
+REMOTE_URL=$(git remote get-url origin 2>/dev/null || echo "")
+if [[ "$REMOTE_URL" == https://* ]]; then
+    echo "Switching remote from HTTPS to SSH..."
+    GITHUB_REPO=$(echo "$REMOTE_URL" | sed -E 's|https://github.com/(.+)/(.+)\.git|\1/\2|')
+    GITHUB_USERNAME=$(echo "$GITHUB_REPO" | cut -d'/' -f1)
+    REPO_NAME=$(echo "$GITHUB_REPO" | cut -d'/' -f2)
+    git remote set-url origin "git@github.com:$GITHUB_USERNAME/$REPO_NAME.git"
+    echo "Remote URL updated to use SSH."
+fi
+
 # Check if there are results to commit
 CHANGES=$(git status --porcelain)
 if [ -z "$CHANGES" ]; then
