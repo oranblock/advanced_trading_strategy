@@ -44,10 +44,8 @@ fi
 REMOTE_URL=$(git remote get-url origin 2>/dev/null || echo "")
 if [[ "$REMOTE_URL" == https://* ]]; then
     echo "Switching remote from HTTPS to SSH..."
-    GITHUB_REPO=$(echo "$REMOTE_URL" | sed -E 's|https://github.com/(.+)/(.+)\.git|\1/\2|')
-    GITHUB_USERNAME=$(echo "$GITHUB_REPO" | cut -d'/' -f1)
-    REPO_NAME=$(echo "$GITHUB_REPO" | cut -d'/' -f2)
-    git remote set-url origin "git@github.com:$GITHUB_USERNAME/$REPO_NAME.git"
+    REPO_NAME=$(basename -s .git "$REMOTE_URL")
+    git remote set-url origin "git@github.com:oranblock/$REPO_NAME.git"
     echo "Remote URL updated to use SSH."
 fi
 

@@ -14,8 +14,8 @@ if ! command -v git &> /dev/null; then
     exit 1
 fi
 
-# Check if GitHub username and repo name are provided
-read -p "Enter your GitHub username: " GITHUB_USERNAME
+# Set GitHub username and repo name
+GITHUB_USERNAME="oranblock"
 read -p "Enter repository name (default: advanced_trading_strategy): " REPO_NAME
 REPO_NAME=${REPO_NAME:-advanced_trading_strategy}
 
@@ -75,7 +75,7 @@ This project implements a comprehensive trading strategy pipeline that:
 
 1. Clone the repository:
 \`\`\`bash
-git clone https://github.com/$GITHUB_USERNAME/$REPO_NAME.git
+git clone https://github.com/oranblock/$REPO_NAME.git
 cd $REPO_NAME
 \`\`\`
 
@@ -106,7 +106,7 @@ if [ ! -f "LICENSE" ]; then
     cat > "LICENSE" << EOL
 MIT License
 
-Copyright (c) $(date +"%Y") $GITHUB_USERNAME
+Copyright (c) $(date +"%Y") oranblock
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

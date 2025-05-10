@@ -4,6 +4,7 @@
 # Assumes SSH is already set up and configured for GitHub
 
 # Set these variables to your preferences
+GITHUB_USERNAME="oranblock"
 REPO_NAME="advanced_trading_strategy"
 REPO_DESCRIPTION="Advanced algorithmic trading strategy with XGBoost, hyperparameter tuning, and advanced ICT features"
 REPO_VISIBILITY="public"  # This repository will be publicly accessible
@@ -170,7 +171,7 @@ else
     if [ -n "$GITHUB_USERNAME" ]; then
         # Set up the remote
         echo "Setting up Git remote..."
-        git remote add origin git@github.com:$GITHUB_USERNAME/$REPO_NAME.git
+        git remote add origin git@github.com:oranblock/$REPO_NAME.git
 
         echo "Remote set up successfully. To push your code, run:"
         echo "git push -u origin master"
@@ -180,4 +181,4 @@ else
 fi
 
 echo "Repository setup complete! Your code is now on GitHub."
-echo "Repository URL: https://github.com/$(git config user.name)/$REPO_NAME"
+echo "Repository URL: https://github.com/oranblock/$REPO_NAME"
