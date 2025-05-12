@@ -31,24 +31,38 @@ advanced_trading_strategy/
 │   ├── settings.yaml          # Strategy parameters
 │   └── liquidity_settings.yaml # Liquidity strategy parameters
 ├── data/                       # Data storage (market data, etc.)
+├── dashboard.html              # Real-time trading dashboard
+├── docs/                       # Documentation
+├── final_liquidity_strategy/   # Optimized strategy models and results
 ├── logs/                       # Log files
 ├── notebooks/                  # Jupyter notebooks for analysis
+├── realtime_logs/              # Real-time trading logs
+├── realtime_results/           # Real-time trading performance results
 ├── src/                        # Source code
+│   ├── advanced_features.py   # Advanced feature engineering
 │   ├── config_loader.py       # Configuration loading utilities
 │   ├── data_handler.py        # Data fetching and processing
 │   ├── feature_generator.py   # Feature engineering
 │   ├── hyperparameter_tuning.py # Hyperparameter optimization
+│   ├── json_utils.py          # JSON utilities for real-time trading
+│   ├── labeling_tuner.py      # Optimization for data labeling
 │   ├── liquidity_strategy.py  # Specialized liquidity trading strategy
 │   ├── main_strategy.py       # Main strategy implementation
 │   ├── model_trainer.py       # Model training utilities
 │   ├── threshold_tuner.py     # Specialized probability threshold tuning
 │   ├── utils.py               # Utility functions
-│   └── validation_framework.py # Cross-validation framework
-├── liquidity_strategy_standalone.py # Standalone liquidity strategy implementation
-├── liquidity_strategy_production.py # Production-ready strategy for real trading
+│   ├── validation_framework.py # Cross-validation framework
+│   └── xgboost_tuner.py       # XGBoost hyperparameter tuning
 ├── extended_walkforward_analysis.py # Extended walkforward analysis for robustness testing
+├── final_liquidity_strategy.py      # Final optimized strategy implementation
+├── liquidity_strategy_production.py # Production-ready strategy for real trading
+├── liquidity_strategy_realtime.py   # Real-time trading implementation
+├── liquidity_strategy_standalone.py # Standalone liquidity strategy implementation
 ├── run_extended_walkforward.sh      # Script to run walkforward analysis across timeframes
+├── trading_startup.sh               # Script to start real-time trading
+├── trading_paper.sh                 # Script to start paper trading with real market data
 ├── tune_strategy.py                 # Command-line tool for optimization
+├── update_dashboard.sh              # Script to update the real-time dashboard
 └── requirements.txt                 # Python dependencies
 ```
 
@@ -63,7 +77,7 @@ advanced_trading_strategy/
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/advanced_trading_strategy.git
+git clone https://github.com/oranblock/advanced_trading_strategy.git
 cd advanced_trading_strategy
 ```
 
@@ -89,14 +103,34 @@ Edit `config/settings.yaml` to configure your strategy parameters:
 
 ### Running the Strategy
 
-Run the main strategy:
+#### Backtesting and Analysis
+
+Run the main strategy for historical backtesting:
 ```bash
 python -m src.main_strategy
 ```
 
-Or use the production-ready liquidity strategy:
+Or use the production-ready liquidity strategy for comprehensive analysis:
 ```bash
 python liquidity_strategy_production.py --mode all --ticker EURUSD --timeframe hour --plot-results
+```
+
+#### Real-time Trading
+
+For real-time trading with real market data (paper trading):
+```bash
+./trading_paper.sh
+```
+
+This will:
+1. Start the strategy with real market data from Polygon.io
+2. Execute paper trades (no real money)
+3. Track performance in the dashboard
+4. Update automatically every minute
+
+For live trading (requires broker API integration):
+```bash
+./trading_startup.sh
 ```
 
 ## Strategy Optimization
@@ -204,7 +238,35 @@ The final report includes:
 - **Parameter Stability**: Assessment of parameter effectiveness over time
 - **Recommendations**: Actionable insights for strategy deployment
 
-## Production Strategy
+## Production Trading System
+
+### Real-time Trading Implementation
+
+The project includes a complete real-time trading implementation:
+
+- **`liquidity_strategy_realtime.py`**: Core real-time trading engine
+- **`trading_startup.sh`**: Script to start live trading
+- **`trading_paper.sh`**: Script to start paper trading with real market data
+- **`update_dashboard.sh`**: Script to update the real-time dashboard
+- **`dashboard.html`**: Interactive web-based dashboard
+
+Features:
+- **Multiple Trading Modes**: Live trading, paper trading, demo mode
+- **Real-time Market Data**: Integration with Polygon.io API with Yahoo Finance fallback
+- **Trading Dashboard**: Real-time monitoring of positions, signals, and performance
+- **Proper Risk Management**: ATR-based position sizing, stop losses, and take profits
+- **Notification System**: Trade and signal notifications (customizable)
+
+Example usage:
+```bash
+# Start paper trading with real market data
+./trading_paper.sh
+
+# For live trading (requires broker API setup)
+./trading_startup.sh
+```
+
+### Strategy Implementation
 
 The `liquidity_strategy_production.py` script provides a production-ready implementation with:
 
@@ -239,3 +301,13 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - Inner Circle Trader (ICT) concepts for market structure analysis
 - XGBoost team for the gradient boosting framework
 - Polygon.io for market data access
+- Yahoo Finance for fallback market data
+
+## Recent Updates
+
+- **Real-time Trading System**: Added complete real-time trading implementation with dashboard
+- **Multiple Data Sources**: Added support for Polygon.io with Yahoo Finance fallback
+- **Improved Stop Loss Handling**: Enhanced stop loss monitoring and execution
+- **Paper Trading Mode**: Added paper trading with real market data
+- **Live Trading Capability**: Added support for live trading (requires broker API setup)
+- **Trading Dashboard**: Added interactive web dashboard for performance monitoring

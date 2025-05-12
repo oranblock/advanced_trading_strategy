@@ -29,6 +29,18 @@ import warnings
 from pathlib import Path
 import matplotlib.pyplot as plt
 import seaborn as sns
+import sys
+
+# Add src directory to path for imports
+sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
+from data_handler import fetch_polygon_data
+
+# Optional import for yfinance fallback
+try:
+    import yfinance as yf
+    YFINANCE_AVAILABLE = True
+except ImportError:
+    YFINANCE_AVAILABLE = False
 
 warnings.filterwarnings('ignore')
 
@@ -60,7 +72,10 @@ class RealTimeLiquidityStrategy:
         self.pt_multiplier = args.pt_multiplier
         self.sl_multiplier = args.sl_multiplier
         self.risk_per_trade = args.risk_per_trade
-        
+
+        # Load configuration
+        self.config = self.load_config()
+
         # Trading state variables
         self.current_position = "FLAT"  # "FLAT", "LONG", or "SHORT"
         self.entry_price = 0.0
@@ -68,27 +83,40 @@ class RealTimeLiquidityStrategy:
         self.profit_target = 0.0
         self.stop_loss = 0.0
         self.last_signal = "NEUTRAL"
-        
+
         # Load saved models
         self.model_up, self.model_down = self.load_models()
-        
+
         # Initialize market data
         self.historical_data = None
         self.feature_data = None
-        
+
         # Performance tracking
         self.trades = []
         self.equity_curve = []
         self.initial_equity = args.initial_equity
         self.current_equity = args.initial_equity
-        
+
         # Notification settings
         self.notify_trades = args.notify_trades
         self.notification_emails = args.emails.split(',') if args.emails else []
-        
+
         logger.info(f"Strategy initialized for {self.ticker} ({self.timeframe})")
         logger.info(f"Thresholds: UP={self.up_threshold}, DOWN={self.down_threshold}")
         logger.info(f"Risk per trade: {self.risk_per_trade}%")
+
+    def load_config(self):
+        """Load configuration from settings.yaml."""
+        config_path = os.path.join(os.path.dirname(__file__), 'config', 'settings.yaml')
+        try:
+            with open(config_path, 'r') as file:
+                config = yaml.safe_load(file)
+                logger.info("Configuration loaded successfully")
+                return config
+        except Exception as e:
+            logger.error(f"Error loading configuration: {e}")
+            # Return a default config with an empty API key
+            return {"POLYGON_API_KEY": ""}
     
     def load_models(self):
         """Load the pre-trained XGBoost models."""
@@ -177,21 +205,175 @@ class RealTimeLiquidityStrategy:
         return True
     
     def fetch_historical_data(self):
-        """Fetch historical data for initial feature generation.
-        
-        This is a placeholder - implement with your specific data source.
-        """
-        # In a real implementation, this would fetch data from your data provider
-        # Example: 
-        # self.historical_data = self.broker.get_historical_data(
-        #     symbol=self.ticker,
-        #     timeframe=self.timeframe,
-        #     bars=1000
-        # )
-        
-        # For testing, we'll generate synthetic data
-        logger.info(f"Generating synthetic historical data for {self.ticker}")
-        
+        """Fetch historical data for initial feature generation using Polygon.io API."""
+
+        # If demo mode is enabled, use synthetic data
+        if self.args.demo_mode:
+            logger.info(f"Demo mode enabled - Generating synthetic historical data for {self.ticker}")
+
+            # Create date range
+            end_date = datetime.datetime.now()
+            if self.timeframe == 'minute':
+                start_date = end_date - datetime.timedelta(days=2)
+                freq = 'T'
+            elif self.timeframe == 'hour':
+                start_date = end_date - datetime.timedelta(days=60)
+                freq = 'H'
+            else:  # day
+                start_date = end_date - datetime.timedelta(days=500)
+                freq = 'D'
+
+            # Create index
+            index = pd.date_range(start=start_date, end=end_date, freq=freq)
+
+            # Generate OHLCV data
+            n = len(index)
+            close = np.zeros(n)
+            close[0] = 1.0800  # Starting price for EUR/USD
+
+            # Parameters for random walk
+            drift = 0.00001  # Small upward drift
+            volatility = 0.0005  # Typical hourly volatility for EUR/USD
+
+            for i in range(1, n):
+                # Random walk with drift and volatility
+                close[i] = close[i-1] * (1 + drift + volatility * np.random.normal())
+
+            # Generate open, high, low based on close
+            open_prices = close[:-1].copy()
+            open_prices = np.append([close[0] - 0.0002], open_prices)  # First open
+
+            # High is max of open and close plus random amount
+            high = np.maximum(close, open_prices) + np.random.uniform(0, volatility*2, n)
+
+            # Low is min of open and close minus random amount
+            low = np.minimum(close, open_prices) - np.random.uniform(0, volatility*2, n)
+
+            # Create volume with some patterns
+            volume = np.random.uniform(1000, 5000, n)
+
+            # Create DataFrame
+            self.historical_data = pd.DataFrame({
+                'open': open_prices,
+                'high': high,
+                'low': low,
+                'close': close,
+                'volume': volume
+            }, index=index)
+
+        else:
+            # Use real market data from Polygon.io
+            logger.info(f"Fetching real market data from Polygon.io for {self.ticker}")
+
+            # Get API key from config
+            api_key = self.config.get('POLYGON_API_KEY', '')
+            if not api_key:
+                logger.error("Polygon API key not found in configuration")
+                raise ValueError("Polygon API key is required for real market data")
+
+            logger.info(f"Using Polygon API key: {api_key[:5]}...{api_key[-5:]}")
+
+            # Set timeframe parameters for Polygon API
+            if self.timeframe == 'minute':
+                polygon_timespan = 'minute'
+                multiplier = 1
+                start_date = (datetime.datetime.now() - datetime.timedelta(days=2)).strftime('%Y-%m-%d')
+            elif self.timeframe == 'hour':
+                polygon_timespan = 'hour'
+                multiplier = 1
+                start_date = (datetime.datetime.now() - datetime.timedelta(days=60)).strftime('%Y-%m-%d')
+            else:  # day
+                polygon_timespan = 'day'
+                multiplier = 1
+                start_date = (datetime.datetime.now() - datetime.timedelta(days=500)).strftime('%Y-%m-%d')
+
+            end_date = datetime.datetime.now().strftime('%Y-%m-%d')
+
+            # Format ticker for Polygon (forex is prefixed with C:)
+            if self.ticker.startswith('C:'):
+                polygon_ticker = self.ticker
+            else:
+                polygon_ticker = f"C:{self.ticker}"
+
+            # Fetch data from Polygon.io
+            try:
+                self.historical_data = fetch_polygon_data(
+                    api_key=api_key,
+                    ticker=polygon_ticker,
+                    timespan=polygon_timespan,
+                    multiplier=multiplier,
+                    start_date_str=start_date,
+                    end_date_str=end_date
+                )
+
+                # Validate data
+                if self.historical_data is None or len(self.historical_data) == 0:
+                    raise ValueError("No data returned from Polygon.io API")
+
+            except Exception as e:
+                logger.error(f"Error fetching data from Polygon.io: {e}")
+
+                # Try to use yfinance as a fallback
+                if YFINANCE_AVAILABLE:
+                    logger.warning("Attempting to use yfinance as a fallback data source")
+                    try:
+                        # Convert our ticker format to Yahoo Finance format (EURUSD=X for forex)
+                        if self.ticker.startswith('C:'):
+                            yf_ticker = self.ticker[2:] + "=X"
+                        else:
+                            yf_ticker = self.ticker + "=X" if "USD" in self.ticker else self.ticker
+
+                        logger.info(f"Fetching historical data for {yf_ticker} from Yahoo Finance")
+
+                        # Calculate period based on timeframe
+                        if self.timeframe == 'minute':
+                            period = "7d"  # Yahoo only provides 7 days of minute data
+                            interval = "1m"
+                        elif self.timeframe == 'hour':
+                            period = "60d"
+                            interval = "1h"
+                        else:  # day
+                            period = "2y"
+                            interval = "1d"
+
+                        # Fetch from Yahoo Finance
+                        yf_data = yf.Ticker(yf_ticker).history(period=period, interval=interval)
+
+                        if not yf_data.empty:
+                            # Format to match our expected structure
+                            self.historical_data = yf_data.rename(columns={
+                                'Open': 'open',
+                                'High': 'high',
+                                'Low': 'low',
+                                'Close': 'close',
+                                'Volume': 'volume'
+                            })
+
+                            # Keep only the columns we need
+                            self.historical_data = self.historical_data[['open', 'high', 'low', 'close', 'volume']]
+
+                            logger.info(f"Successfully loaded {len(self.historical_data)} bars from Yahoo Finance")
+                            return self.historical_data
+                        else:
+                            raise ValueError("Empty response from Yahoo Finance")
+
+                    except Exception as yf_error:
+                        logger.error(f"Error fetching data from Yahoo Finance: {yf_error}")
+                        logger.warning("Falling back to demo data as last resort")
+
+                # If we get here, both Polygon and yfinance failed (or yfinance not available)
+                # Only use synthetic data if it's truly a last resort
+                logger.warning("⚠️ ATTENTION: Using DEMO DATA - Trading performance will not be accurate ⚠️")
+                logger.warning("To get real market data, fix API connection or install yfinance")
+                return self.generate_synthetic_data()
+
+        logger.info(f"Historical data loaded with {len(self.historical_data)} bars")
+        return self.historical_data
+
+    def generate_synthetic_data(self):
+        """Generate synthetic data as a fallback."""
+        logger.info(f"Generating synthetic data for {self.ticker}")
+
         # Create date range
         end_date = datetime.datetime.now()
         if self.timeframe == 'minute':
@@ -203,37 +385,26 @@ class RealTimeLiquidityStrategy:
         else:  # day
             start_date = end_date - datetime.timedelta(days=500)
             freq = 'D'
-        
-        # Create index
+
+        # Create index and synthetic data (same as in demo mode)
         index = pd.date_range(start=start_date, end=end_date, freq=freq)
-        
-        # Generate OHLCV data
         n = len(index)
         close = np.zeros(n)
-        close[0] = 1.0800  # Starting price for EUR/USD
-        
-        # Parameters for random walk
-        drift = 0.00001  # Small upward drift
-        volatility = 0.0005  # Typical hourly volatility for EUR/USD
-        
+        close[0] = 1.0800
+
+        drift = 0.00001
+        volatility = 0.0005
+
         for i in range(1, n):
-            # Random walk with drift and volatility
             close[i] = close[i-1] * (1 + drift + volatility * np.random.normal())
-        
-        # Generate open, high, low based on close
+
         open_prices = close[:-1].copy()
-        open_prices = np.append([close[0] - 0.0002], open_prices)  # First open
-        
-        # High is max of open and close plus random amount
+        open_prices = np.append([close[0] - 0.0002], open_prices)
+
         high = np.maximum(close, open_prices) + np.random.uniform(0, volatility*2, n)
-        
-        # Low is min of open and close minus random amount
         low = np.minimum(close, open_prices) - np.random.uniform(0, volatility*2, n)
-        
-        # Create volume with some patterns
         volume = np.random.uniform(1000, 5000, n)
-        
-        # Create DataFrame
+
         self.historical_data = pd.DataFrame({
             'open': open_prices,
             'high': high,
@@ -241,56 +412,170 @@ class RealTimeLiquidityStrategy:
             'close': close,
             'volume': volume
         }, index=index)
-        
-        logger.info(f"Historical data loaded with {len(self.historical_data)} bars")
+
         return self.historical_data
     
     def update_data(self, new_bar=None):
         """Update data with the latest price information.
-        
+
         Args:
             new_bar: The new price bar to add (if None, will fetch from API)
         """
         if new_bar is None:
-            # In a real implementation, fetch the latest bar from your data provider
-            # new_bar = self.broker.get_latest_bar(self.ticker, self.timeframe)
-            
-            # For testing, generate a synthetic bar
-            last_close = self.historical_data['close'].iloc[-1]
-            last_date = self.historical_data.index[-1]
-            
-            # Determine next bar's timestamp
-            if self.timeframe == 'minute':
-                next_date = last_date + datetime.timedelta(minutes=1)
-            elif self.timeframe == 'hour':
-                next_date = last_date + datetime.timedelta(hours=1)
-            else:  # day
-                next_date = last_date + datetime.timedelta(days=1)
-            
-            # Generate a new synthetic bar
-            close = last_close * (1 + 0.0005 * np.random.normal())
-            open_price = last_close * (1 + 0.0002 * np.random.normal())
-            high = max(close, open_price) + 0.0005 * np.random.random()
-            low = min(close, open_price) - 0.0005 * np.random.random()
-            volume = 1000 + 4000 * np.random.random()
-            
-            new_bar = pd.DataFrame({
-                'open': [open_price],
-                'high': [high],
-                'low': [low],
-                'close': [close],
-                'volume': [volume]
-            }, index=[next_date])
-        
+            # If in demo mode or if provided a bar, use that
+            if self.args.demo_mode:
+                # Generate a synthetic bar for demo mode
+                last_close = self.historical_data['close'].iloc[-1]
+                last_date = self.historical_data.index[-1]
+
+                # Determine next bar's timestamp
+                if self.timeframe == 'minute':
+                    next_date = last_date + datetime.timedelta(minutes=1)
+                elif self.timeframe == 'hour':
+                    next_date = last_date + datetime.timedelta(hours=1)
+                else:  # day
+                    next_date = last_date + datetime.timedelta(days=1)
+
+                # Generate a new synthetic bar
+                close = last_close * (1 + 0.0005 * np.random.normal())
+                open_price = last_close * (1 + 0.0002 * np.random.normal())
+                high = max(close, open_price) + 0.0005 * np.random.random()
+                low = min(close, open_price) - 0.0005 * np.random.random()
+                volume = 1000 + 4000 * np.random.random()
+
+                new_bar = pd.DataFrame({
+                    'open': [open_price],
+                    'high': [high],
+                    'low': [low],
+                    'close': [close],
+                    'volume': [volume]
+                }, index=[next_date])
+            else:
+                # Fetch the latest bar from Polygon.io for real-time data
+                try:
+                    api_key = self.config.get('POLYGON_API_KEY', '')
+                    if not api_key:
+                        raise ValueError("Polygon API key is required for real-time data")
+
+                    # Format ticker for Polygon
+                    if self.ticker.startswith('C:'):
+                        polygon_ticker = self.ticker
+                    else:
+                        polygon_ticker = f"C:{self.ticker}"
+
+                    # Get the last timestamp in our data
+                    last_date = self.historical_data.index[-1]
+
+                    # Convert timeframe to Polygon format
+                    if self.timeframe == 'minute':
+                        polygon_timespan = 'minute'
+                        multiplier = 1
+                    elif self.timeframe == 'hour':
+                        polygon_timespan = 'hour'
+                        multiplier = 1
+                    else:  # day
+                        polygon_timespan = 'day'
+                        multiplier = 1
+
+                    # Only fetch data since our last update
+                    from_date = (last_date + datetime.timedelta(seconds=1)).strftime('%Y-%m-%d')
+                    to_date = datetime.datetime.now().strftime('%Y-%m-%d')
+
+                    # Don't fetch if we're already up to date
+                    if from_date > to_date:
+                        logger.debug("Already up to date, skipping fetch")
+                        return self.historical_data
+
+                    # Fetch latest data
+                    latest_data = fetch_polygon_data(
+                        api_key=api_key,
+                        ticker=polygon_ticker,
+                        timespan=polygon_timespan,
+                        multiplier=multiplier,
+                        start_date_str=from_date,
+                        end_date_str=to_date
+                    )
+
+                    # Check if we got any new data
+                    if latest_data is not None and len(latest_data) > 0:
+                        # The entire latest data becomes our new bar
+                        new_bar = latest_data
+                        logger.info(f"Fetched {len(new_bar)} new bars from Polygon.io")
+                    else:
+                        logger.debug("No new data available from Polygon.io")
+                        return self.historical_data
+
+                except Exception as e:
+                    logger.error(f"Error fetching latest data from Polygon.io: {e}")
+
+                    # Try to use yfinance as a fallback
+                    if YFINANCE_AVAILABLE:
+                        logger.warning("Attempting to use yfinance as a fallback data source")
+                        try:
+                            # Convert our ticker format to Yahoo Finance format (EURUSD=X for forex)
+                            if self.ticker.startswith('C:'):
+                                yf_ticker = self.ticker[2:] + "=X"
+                            else:
+                                yf_ticker = self.ticker + "=X" if "USD" in self.ticker else self.ticker
+
+                            # Get the last timestamp in our data
+                            last_date = self.historical_data.index[-1]
+
+                            # Calculate periods based on timeframe
+                            if self.timeframe == 'minute':
+                                period = "1d"
+                                interval = "1m"
+                            elif self.timeframe == 'hour':
+                                period = "7d"
+                                interval = "1h"
+                            else:  # day
+                                period = "30d"
+                                interval = "1d"
+
+                            # Fetch data from Yahoo Finance
+                            yf_data = yf.Ticker(yf_ticker).history(period=period, interval=interval)
+
+                            if not yf_data.empty:
+                                # Get only the data after our last date
+                                latest_data = yf_data[yf_data.index > last_date]
+
+                                if not latest_data.empty:
+                                    # Format to match our expected structure
+                                    latest_data = latest_data.rename(columns={
+                                        'Open': 'open',
+                                        'High': 'high',
+                                        'Low': 'low',
+                                        'Close': 'close',
+                                        'Volume': 'volume'
+                                    })
+
+                                    new_bar = latest_data[['open', 'high', 'low', 'close', 'volume']]
+                                    logger.info(f"Successfully fetched {len(new_bar)} bars from Yahoo Finance")
+                                else:
+                                    logger.info("No new data available from Yahoo Finance")
+                                    return self.historical_data
+                            else:
+                                logger.warning("Empty response from Yahoo Finance")
+                                return self.historical_data
+                        except Exception as yf_error:
+                            logger.error(f"Error fetching data from Yahoo Finance: {yf_error}")
+                            logger.warning("Using last known data. THIS WILL NOT AFFECT TRADING PERFORMANCE.")
+                            return self.historical_data
+
+                    # If we reach here and yfinance is not available, inform the user
+                    logger.warning("No fallback data source available. Using last known data.")
+                    logger.info("Consider installing yfinance for better fallback: pip install yfinance")
+                    return self.historical_data
+
         # Append the new bar to historical data
         self.historical_data = pd.concat([self.historical_data, new_bar])
-        
+
         # Optional: Trim historical data to keep it at a manageable size
         max_bars = 10000
         if len(self.historical_data) > max_bars:
             self.historical_data = self.historical_data.iloc[-max_bars:]
-        
-        logger.debug(f"Data updated with new bar at {new_bar.index[0]}")
+
+        logger.debug(f"Data updated with {len(new_bar)} new bars")
         return self.historical_data
     
     def add_basic_features(self):
@@ -589,12 +874,26 @@ class RealTimeLiquidityStrategy:
                 # Close the position with profit
                 profit = (current_price - self.entry_price) * self.position_size * 100000
                 self.current_equity += profit
-                
+
                 logger.info(f"LONG position closed at profit target {current_price:.5f}, profit: ${profit:.2f}")
-                
+
                 # Record trade
                 self.record_trade("EXIT", "LONG", current_price, self.position_size, profit)
-                
+
+                # Reset position
+                self.current_position = "FLAT"
+
+            # Check if price hit stop loss
+            elif current_price <= self.stop_loss:
+                # Close the position with loss
+                loss = (current_price - self.entry_price) * self.position_size * 100000
+                self.current_equity += loss
+
+                logger.info(f"⚠️ LONG position stopped out at {current_price:.5f}, loss: ${loss:.2f}")
+
+                # Record trade
+                self.record_trade("EXIT", "LONG", current_price, self.position_size, loss)
+
                 # Reset position
                 self.current_position = "FLAT"
                 self.position_size = 0
@@ -608,19 +907,20 @@ class RealTimeLiquidityStrategy:
                 # Close the position with loss
                 loss = (current_price - self.entry_price) * self.position_size * 100000
                 self.current_equity += loss
-                
-                logger.info(f"LONG position closed at stop loss {current_price:.5f}, loss: ${loss:.2f}")
-                
+
+                logger.info(f"⚠️ LONG position closed at stop loss {current_price:.5f}, loss: ${loss:.2f}")
+                logger.info(f"Entry: {self.entry_price:.5f}, SL hit: {current_price:.5f}, SL level: {self.stop_loss:.5f}")
+
                 # Record trade
                 self.record_trade("EXIT", "LONG", current_price, self.position_size, loss)
-                
+
                 # Reset position
                 self.current_position = "FLAT"
                 self.position_size = 0
-                
+
                 # Send notification if enabled
                 if self.notify_trades:
-                    self.send_notification(f"LONG position closed at stop loss {current_price:.5f}, loss: ${loss:.2f}")
+                    self.send_notification(f"⚠️ LONG position stopped out at {current_price:.5f}, loss: ${loss:.2f}")
         
         elif self.current_position == "SHORT":
             # Check if price reached profit target
